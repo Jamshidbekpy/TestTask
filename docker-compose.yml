@@ -17,7 +17,7 @@ services:
     depends_on:
       - db
       # - rabbitmq
-      - redis
+      # - redis
 
   # PostgreSQL database
   db:
@@ -58,54 +58,54 @@ services:
   #     retries: 5
 
   # Redis result backend
-  redis:
-    image: redis:7
-    container_name: redis
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # redis:
+  #   image: redis:7
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
-  # Celery worker
-  celery:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: celery_worker
-    command: celery -A core worker --loglevel=info
-    volumes:
-      - .:/code
-    env_file:
-      - .env
-    depends_on:
-      # rabbitmq:
-      #   condition: service_healthy
-      redis:
-        condition: service_healthy
-      web:
-        condition: service_started
+  # # Celery worker
+  # celery:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: celery_worker
+  #   command: celery -A core worker --loglevel=info
+  #   volumes:
+  #     - .:/code
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     # rabbitmq:
+  #     #   condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     web:
+  #       condition: service_started
 
-  # Celery beat
-  celery-beat:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: celery_beat
-    command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - .:/code
-    env_file:
-      - .env
-    depends_on:
-      # rabbitmq:
-      #   condition: service_healthy
-      redis:
-        condition: service_healthy
-      web:
-        condition: service_started
+  # # Celery beat
+  # celery-beat:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: celery_beat
+  #   command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+  #   volumes:
+  #     - .:/code
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     # rabbitmq:
+  #     #   condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     web:
+  #       condition: service_started
 
   # # Flower monitoring
   # flower:
@@ -123,21 +123,21 @@ services:
   #   restart: always
 
   # Daphne ASGI server
-  daphne:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ${PROJECT_NAME}_ws
-    command: python -m daphne -b 0.0.0.0 -p 8893 core.asgi:application
-    volumes:
-      - .:/code
-    ports:
-      - "8893:8893"
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - redis
+  # daphne:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: ${PROJECT_NAME}_ws
+  #   command: python -m daphne -b 0.0.0.0 -p 8893 core.asgi:application
+  #   volumes:
+  #     - .:/code
+  #   ports:
+  #     - "8893:8893"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #     - redis
 
   # # Bot service
   # bot:
