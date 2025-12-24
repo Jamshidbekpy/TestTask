@@ -16,7 +16,7 @@ services:
       - .env
     depends_on:
       - db
-      - rabbitmq
+      # - rabbitmq
       - redis
 
   # PostgreSQL database
@@ -30,7 +30,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -39,23 +39,23 @@ services:
       timeout: 5s
       retries: 5
 
-  # RabbitMQ broker
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    env_file:
-      - .env
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # # RabbitMQ broker
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+  #     RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   # Redis result backend
   redis:
@@ -81,8 +81,8 @@ services:
     env_file:
       - .env
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      # rabbitmq:
+      #   condition: service_healthy
       redis:
         condition: service_healthy
       web:
@@ -100,27 +100,27 @@ services:
     env_file:
       - .env
     depends_on:
-      rabbitmq:
-        condition: service_healthy
+      # rabbitmq:
+      #   condition: service_healthy
       redis:
         condition: service_healthy
       web:
         condition: service_started
 
-  # Flower monitoring
-  flower:
-    image: mher/flower
-    container_name: flower
-    ports:
-      - "5555:5555"
-    environment:
-      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    env_file:
-      - .env
-    restart: always
+  # # Flower monitoring
+  # flower:
+  #   image: mher/flower
+  #   container_name: flower
+  #   ports:
+  #     - "5555:5555"
+  #   environment:
+  #     - CELERY_BROKER_URL=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+  #   # depends_on:
+  #     # rabbitmq:
+  #     #   condition: service_healthy
+  #   env_file:
+  #     - .env
+  #   restart: always
 
   # Daphne ASGI server
   daphne:
@@ -139,19 +139,19 @@ services:
       - db
       - redis
 
-  # Bot service
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ${PROJECT_NAME}_bot
-    command: python bot/app.py
-    volumes:
-      - .:/code
-    env_file:
-      - .env
-    depends_on:
-      - db
+  # # Bot service
+  # bot:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: ${PROJECT_NAME}_bot
+  #   command: python bot/app.py
+  #   volumes:
+  #     - .:/code
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
 
 volumes:
   postgres_data:

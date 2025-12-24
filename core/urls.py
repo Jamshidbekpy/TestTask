@@ -28,6 +28,8 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path("admin/", admin.site.urls),
+    path("api/v1/auth/", include("apps.accounts.urls")),
+    path("api/v1/calendar/", include("apps.calendarapp.urls")),
     path("rosetta/", include("rosetta.urls")),
 )
 
