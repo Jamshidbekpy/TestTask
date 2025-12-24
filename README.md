@@ -1,2 +1,3 @@
-# Jamshidbekpy-Structure
-this is foundation for my projects 
+# TestProject
+start project
+``` docker compose -d --build ```
